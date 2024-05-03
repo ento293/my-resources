@@ -1,0 +1,68 @@
+---
+title: "Data_Presentation_Sloan"
+author: "Charli Geer"
+date: "2024-04-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/charl/OneDrive - Colostate/Spring 2024/CM515/CM515_Github/CM515-course-2024/modules/13_Presenting_Data')
+```
+
+```{r}
+library(ggplot2)
+setwd("C:/Users/charl/OneDrive - Colostate/Spring 2024/CM515/CM515_Github/CM515-course-2024/modules/13_Presenting_Data")
+RNAseq = read.delim("SlidingWindow.txt")
+
+str(RNAseq)
+RNAseq[1:5,]
+
+RNAseq_chrom21 = RNAseq[which(RNAseq$Chrom==21),]
+
+singlePlot = ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM))
+
+
+
+plot (RNAseq_chrom21$Pos, RNAseq_chrom21$RCM)
+
+singlePlot = ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM)) + geom_point()
+
+
+singlePlot = ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM, color=Region)) + geom_point()
+
+singlePlot + scale_color_manual(values=c("red", "black"))
+
+singlePlot2 = ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM, color=Enrichment)) + geom_point()
+
+singlePlot2
+
+install.packages("viridis")
+
+library(viridis)
+
+singlePlot2 + scale_color_viridis()
+
+ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM, color=Enrichment)) + geom_point() + scale_color_viridis() + scale_y_log10()
+
+ggplot (data=RNAseq_chrom21, aes(x=Pos, y=RCM, color=Enrichment)) + geom_point() + scale_color_viridis() + scale_y_log10() + xlab("Nucleotide Position") + ylab("Read Count Per Million")
+
+
+ggplot (data=RNAseq_chrom21, aes(x=Pos/1000, y=RCM, color=Enrichment)) + geom_point() + scale_color_viridis() + scale_y_log10() + xlab("Nucleotide Position (kb)") + ylab("Read Count Per Million")
+
+ggplot (data=RNAseq_chrom21, aes(x=Pos/1000, y=RCM, color=Enrichment)) + geom_point(size=0.5) + scale_color_viridis() + scale_y_log10() + xlab("Nucleotide Position (kb)") + ylab("Read Count Per Million")
+
+
+ggplot (data=RNAseq_chrom21, aes(x=Pos/1000, y=RCM, color=Enrichment)) + geom_point(size=0.5) + scale_color_viridis() + scale_y_log10() + xlab("Nucleotide Position (kb)") + ylab("Read Count Per Million") + theme_bw()
+
+multiPlot <- ggplot (data=RNAseq, aes(x=Pos/1000, y=RCM, color=Enrichment)) + geom_point(size=0.5) + scale_color_viridis() + scale_y_log10() + xlab("Nucleotide Position (kb)") + ylab("Read Count Per Million") + theme_bw() + scale_x_continuous (breaks=c(0,75,150)) + facet_wrap(~Chrom, nrow=7) 
+
+```
+
+```{r}
+pdf ("multiPlot.pdf")  
+multiPlot  
+dev.off()
+
+```
+

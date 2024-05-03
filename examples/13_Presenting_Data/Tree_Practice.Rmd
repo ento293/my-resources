@@ -1,0 +1,87 @@
+---
+title: "ggtree_practice"
+author: "Charli Geer"
+date: "2024-04-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/charl/OneDrive - Colostate/Spring 2024/CM515/CM515_Github/CM515-course-2024/modules/13_Presenting_Data')
+```
+
+```{r}
+library(ggplot2)
+library(viridis)
+
+if (!requireNamespace("BiocManager", quietly = TRUE)){
+  install.packages("BiocManager")
+}
+
+if (!requireNamespace("ggtree", quietly = TRUE)){
+  BiocManager::install("ggtree")
+}
+library(ggtree)
+```
+
+### Import tree
+```{r}
+setwd("C:/Users/charl/OneDrive - Colostate/Spring 2024/CM515/CM515_Github/CM515-course-2024/modules/13_Presenting_Data")
+tree = ggtree::read.tree(file = "tree.nwk")
+tree
+```
+
+### plot the tree
+
+```{r}
+ggplot(tree) + geom_tree() + geom_tiplab() + theme_tree()
+
+
+ggplot(tree) + geom_tree(color="firebrick", size=0.5, linetype="dotted", layout="roundrect") + geom_tiplab(size=3) + theme_tree()
+
+
+```
+
+### root the tree
+```{r}
+tree_rooted = ape::root(tree, outgroup = "Helicobacter_pylori_AAD07685.1", resolve.root=TRUE)
+
+ggplot(tree_rooted) + geom_tree() + geom_tiplab() + theme_tree()
+
+# prevent tips from getting cut off
+ggplot(tree_rooted) + geom_tree() + geom_tiplab() + theme_tree() + hexpand(0.25)
+
+
+```
+
+### annotate clades within the tree
+```{r}
+# annotate clades
+ggplot(tree_rooted) + geom_tree() + geom_tiplab(size=3) + theme_tree() + hexpand(0.25) + 
+  geom_hilight(node=36, fill="chartreuse4", alpha=.3, type = "gradient", to.bottom=TRUE, extend=1) + 
+  geom_hilight(node=44, fill="chartreuse4", alpha=.3, type = "gradient", to.bottom=TRUE, extend=1) + 
+  geom_cladelab(node=36, label = "MutS2a", angle=270, hjust = "center", offset=1, offset.text=0.1) + 
+  geom_cladelab(node=44, label = "MutS2b", angle=270, hjust = "center", offset=1, offset.text=0.1)
+```
+
+
+store a tree and add a facet
+```{r}
+gene_data = read.delim("gene_data.txt")
+
+gene_data[1:5,]
+
+#store the tree
+p1 = ggplot(tree_rooted, aes(x,y)) + geom_tree() + geom_tiplab(size=2.5) + hexpand(1.5) + theme_tree()
+
+#add a facet with lines corresponding to the length of each protein
+p2 = facet_plot(p1, panel = "Domains", data = gene_data, geom = geom_segment, mapping = aes(x=0, xend=Seq_Length, y=y, yend=y), size=0.5, color='black')
+
+#add the domains on top of those lines
+p3 = facet_plot(p2, panel = "Domains", data = gene_data, geom=geom_segment, aes(x=Domain_Start, xend=Domain_End, y=y, yend=y, col=Domain_Name), size=3) + theme(legend.position = "bottom") + scale_color_viridis(discrete = TRUE)
+
+#add another facet with a bar graph showing the probability of plastid targeting
+p4 = facet_plot(p3, panel = "Plastid Targeting", data = gene_data, geom=geom_col, aes(x=Plastid_Targeting), orientation = 'y', fill="chartreuse4") + theme(legend.position = "bottom")
+
+p4
+```
