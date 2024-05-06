@@ -12,6 +12,7 @@ This is a collection of my computational resources
 
 ## R stuff
 [Cheat sheet for R code](https://iqss.github.io/dss-workshops/R/Rintro/base-r-cheat-sheet.pdf)
+
 [R color Palette Cheatsheet](https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf)
 
 ## Python stuff
